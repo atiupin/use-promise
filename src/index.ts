@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useReducer, useRef, Reducer } from 'react';
 
-interface PromiseConfig<T, U> {
+export interface PromiseConfig<T, U> {
   promise?: Promise<T>;
   promiseThunk?: (payload: U) => Promise<T>;
-  onResolve?: () => any;
-  onReject?: () => any;
+  onResolve?: (data: T) => any;
+  onReject?: (error: Error) => any;
 }
 
 interface InternalState<T> {
   data?: T;
   error?: Error;
-  loading: boolean;
+  isPending: boolean;
 }
 
-interface PromiseState<T, U> extends InternalState<T> {
+export interface PromiseState<T, U> extends InternalState<T> {
   run: (payload: U) => void;
 }
 
@@ -47,7 +47,7 @@ type Action<T> = RunAction | ResolveAction<T> | RejectAction | CancelAction;
 const defaultState = {
   data: undefined,
   error: undefined,
-  loading: false,
+  isPending: false,
 };
 
 const reducer = <T>(
@@ -59,25 +59,25 @@ const reducer = <T>(
       return {
         ...state,
         error: undefined,
-        loading: true,
+        isPending: true,
       };
     case actionTypes.resolve:
       return {
         ...state,
         data: action.payload,
         error: undefined,
-        loading: false,
+        isPending: false,
       };
     case actionTypes.reject:
       return {
         ...state,
         error: action.payload,
-        loading: false,
+        isPending: false,
       };
     case actionTypes.cancel:
       return {
         ...state,
-        loading: false,
+        isPending: false,
       };
     default:
       return state;
@@ -125,7 +125,7 @@ const usePromise = <T, U = undefined>({
             });
 
             if (onResolve) {
-              onResolve();
+              onResolve(data);
             }
           }
         })
@@ -137,7 +137,7 @@ const usePromise = <T, U = undefined>({
             });
 
             if (onReject) {
-              onReject();
+              onReject(error);
             }
           }
         });

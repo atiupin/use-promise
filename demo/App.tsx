@@ -97,7 +97,7 @@ const App = () => {
           returns square of any number after 1 second. "Throw errors" toggles if
           fetchSquare will resolve or rejects promise.
         </p>
-        <h2>Run promise on data update</h2>
+        <h2>Data-driven way</h2>
         <p>
           Simpliest way to use usePromise — pass a promise argument in config.
           It will run it instantly on component mount.
@@ -107,7 +107,7 @@ const App = () => {
             'const promise = useMemo(() => fetchSquare(counter), [fetchSquare, counter]);'
           }
           <br />
-          {'const { data, error, loading } = usePromise({ promise });'}
+          {'const { data, error, isPending } = usePromise({ promise });'}
         </code>
         <p>
           You must memoize promise in advance or you'll get an infinite loop,
@@ -117,11 +117,11 @@ const App = () => {
         <section>
           {counterNode}
           <p>
-            Data: {String(onMountState.data)}
+            data: {String(onMountState.data)}
             <br />
-            Error: {formatError(onMountState.error)}
+            error: {formatError(onMountState.error)}
             <br />
-            Loading: {String(onMountState.loading)}
+            isPending: {String(onMountState.isPending)}
           </p>
           <p>
             {plusCounterNode} {toggleThrowErrorsNode}
@@ -131,7 +131,7 @@ const App = () => {
           Note now changing the counter generates new promise and cancels
           previous one.
         </p>
-        <h2>Run promise on demand</h2>
+        <h2>Callback way</h2>
         <p>
           Slightly more complex way to use usePromise. Pass function that
           returns promise in promiseThunk, and then call run callback on button
@@ -139,7 +139,7 @@ const App = () => {
         </p>
         <code>
           {
-            'const { data, error, loading, run } = usePromise({ promiseThunk: fetchSquare });'
+            'const { data, error, isPending, run } = usePromise({ promiseThunk: fetchSquare });'
           }
           <br />
           {'<button onClick={() => run(counter)}>Run Promise</button>'}
@@ -153,11 +153,11 @@ const App = () => {
         <section>
           {counterNode}
           <p>
-            Data: {String(onEventState.data)}
+            data: {String(onEventState.data)}
             <br />
-            Error: {formatError(onEventState.error)}
+            error: {formatError(onEventState.error)}
             <br />
-            Loading: {String(onEventState.loading)}
+            isPending: {String(onEventState.isPending)}
           </p>
           <p>
             <button onClick={() => onEventState.run(counter)}>
