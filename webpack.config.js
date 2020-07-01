@@ -18,6 +18,7 @@ module.exports = {
   entry: srcPath,
   output: {
     path: outPath,
+    filename: '[hash].bundle.js',
   },
   module: {
     rules: [
