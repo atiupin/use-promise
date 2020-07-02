@@ -1,5 +1,5 @@
 {
-  "name": "@alextewpib/use-promise",
+  "name": "@alextewpin/use-promise",
   "version": "0.2.0",
   "author": "Alexander Tewpin <alex.tewpin@gmail.com> (https://github.com/alextewpin)",
   "repository": {
@@ -19,9 +19,10 @@
     "src",
     "lib"
   ],
+  "main": "lib/index.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "rimraf lib && npm run build:tsc && npm run build:babel",
+    "build": "rimraf lib && npm run build:babel && npm run build:tsc && npm run build:demo",
     "build:babel": "babel src --out-dir lib --extensions .ts",
     "build:tsc": "tsc --project tsconfig.npm.json",
     "build:demo": "NODE_ENV=production webpack",
