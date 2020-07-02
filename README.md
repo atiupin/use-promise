@@ -12,7 +12,7 @@ $ npm i @alextewpin/use-promise
 
 ### Data-driven
 
-Simpliest way to use `use-promise` is to create a memoized data-dependent promise and pass it to the hook config:
+Simplest way to use `use-promise` is to create a memoized data-dependent promise and pass it to the hook config:
 
 ```js
 import React, { useMemo } from 'react';
