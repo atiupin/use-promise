@@ -5,7 +5,7 @@ Hook for declarative promises. Useful for fetching data, sending forms and doing
 ## Installation
 
 ```
-$ npm i use-promise
+$ npm i @alextewpin/use-promise
 ```
 
 ## Usage
@@ -16,7 +16,7 @@ Simpliest way to use `use-promise` is to create a memoized data-dependent promis
 
 ```js
 import React, { useMemo } from 'react';
-import usePromise from 'usePromise';
+import usePromise from '@alextewpin/use-promise';
 
 import { fetchUser } from 'api';
 
@@ -39,7 +39,7 @@ Another handy way to call promise is using `promiseThunk` in config and `run` ca
 
 ```js
 import React, { useState } from 'react';
-import usePromise from 'usePromise';
+import usePromise from '@alextewpin/use-promise';
 
 import { sendFeedback } from 'api';
 
