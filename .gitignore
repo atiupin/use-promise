@@ -1,5 +1,6 @@
-/node_modules
-/build
-/lib
+node_modules
+build
+lib
+.vscode
 .DS_Store
 npm-debug.log*

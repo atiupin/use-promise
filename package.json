@@ -1,10 +1,28 @@
 {
-  "name": "use-promise",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@alextewpib/use-promise",
+  "version": "0.2.0",
+  "author": "Alexander Tewpin <alex.tewpin@gmail.com> (https://github.com/alextewpin)",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alextewpin/use-promise.git"
+  },
+  "keywords": [
+    "promise",
+    "use-promise",
+    "async",
+    "use-async",
+    "react-native",
+    "react"
+  ],
+  "license": "MIT",
+  "files": [
+    "src",
+    "lib"
+  ],
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "NODE_ENV=production webpack"
+    "build:demo": "NODE_ENV=production webpack",
+    "format": "prettier --write '**/*.*'"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -23,5 +41,8 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
+  },
+  "peerDependencies": {
+    "react": ">16.8"
   }
 }
