@@ -94,18 +94,18 @@ Default export, hook that accepts `PromiseConfig` and returns `PromiseState`. In
 
 ### interface PromiseConfig<Data, Payload>
 
-| Parameter      | Type                                  | Desrciption                                                                                                                   |
-| -------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `promise`      | `Promise<Data>`                       | Promise, that will automatically runned on mount. Mutually exclusive with `promiseThunk`. Dependent on every other parameter. |
-| `promiseThunk` | `(payload: Payload) => Promise<Data>` | Function that returns promise, can be called manually with `run`. Mutually exclusive with `promise`.                          |
-| `onResolve`    | `(data: Data) => any`                 | Function that will be called on promise resolution.                                                                           |
-| `onReject`     | `(error: Error) => any`               | Function that will be called on promise rejection.                                                                            |
+| Parameter       | Type                                  | Desrciption                                                                                                                   |
+| --------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `promise?`      | `Promise<Data>`                       | Promise, that will automatically runned on mount. Mutually exclusive with `promiseThunk`. Dependent on every other parameter. |
+| `promiseThunk?` | `(payload: Payload) => Promise<Data>` | Function that returns promise, can be called manually with `run`. Mutually exclusive with `promise`.                          |
+| `onResolve?`    | `(data: Data) => any`                 | Function that will be called on promise resolution.                                                                           |
+| `onReject?`     | `(error: Error) => any`               | Function that will be called on promise rejection.                                                                            |
 
 ### interface PromiseState<Data, Payload>
 
 | Parameter   | Type                         | Desrciption                              |
 | ----------- | ---------------------------- | ---------------------------------------- |
-| `data`      | `Data \| undefined`          | Result of resolved promise.              |
-| `error`     | `Error \| undefined`         | Error of rejected promise.               |
+| `data?`     | `Data`                       | Result of resolved promise.              |
+| `error?`    | `Error`                      | Error of rejected promise.               |
 | `isPending` | `boolean`                    | Promise pending status.                  |
 | `run`       | `(payload: Payload) => void` | Run `promiseThunk` with given `Payload`. |
