@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const srcPath = path.resolve(__dirname, 'demo');
-const outPath = path.resolve(__dirname, 'build');
+const outPath = path.resolve(__dirname, 'docs');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
