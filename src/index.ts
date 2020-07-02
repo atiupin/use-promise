@@ -56,29 +56,25 @@ const reducer = <T>(
 ): InternalState<T> => {
   switch (action.type) {
     case actionTypes.run:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         error: undefined,
         isPending: true,
-      };
+      });
     case actionTypes.resolve:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         data: action.payload,
         error: undefined,
         isPending: false,
-      };
+      });
     case actionTypes.reject:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         error: action.payload,
         isPending: false,
-      };
+      });
     case actionTypes.cancel:
-      return {
-        ...state,
+      return Object.assign({}, state, {
         isPending: false,
-      };
+      });
     default:
       return state;
   }
@@ -91,10 +87,13 @@ const usePromise = <T, U = undefined>({
   onReject,
 }: PromiseConfig<T, U>): PromiseState<T, U> => {
   const pendingPromiseRef = useRef<Promise<void> | null>(null);
-  const [state, dispatch] = useReducer<Reducer<InternalState<T>, Action<T>>>(
+  const usedReducer = useReducer<Reducer<InternalState<T>, Action<T>>>(
     reducer,
     defaultState,
   );
+
+  const state = usedReducer[0];
+  const dispatch = usedReducer[1];
 
   if (userPromise && promiseThunk)
     throw new Error(
@@ -162,10 +161,9 @@ const usePromise = <T, U = undefined>({
     }
   }, [userPromise, runPromise]);
 
-  return {
-    ...state,
+  return Object.assign({}, state, {
     run,
-  };
+  });
 };
 
 export default usePromise;

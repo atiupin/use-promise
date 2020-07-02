@@ -21,6 +21,9 @@
   ],
   "scripts": {
     "start": "webpack-dev-server",
+    "build": "rimraf lib && npm run build:tsc && npm run build:babel",
+    "build:babel": "babel src --out-dir lib --extensions .ts",
+    "build:tsc": "tsc --project tsconfig.npm.json",
     "build:demo": "NODE_ENV=production webpack",
     "format": "prettier --write '**/*.*'"
   },
@@ -37,6 +40,7 @@
     "prettier": "^2.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "rimraf": "^3.0.2",
     "typescript": "^3.9.5",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",

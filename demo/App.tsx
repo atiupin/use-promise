@@ -67,8 +67,8 @@ const App = () => {
         <h1>use-promise demo</h1>
         <p>
           This is just a demo/testing page. Read{' '}
-          <a href="https://github.com/">documentation</a>, if you want to learn
-          about the hook usage.
+          <a href="https://github.com/alextewpin/use-promise">documentation</a>,
+          if you want to learn about the hook usage.
         </p>
         <p>
           In this example we have a counter and async function, that returns
