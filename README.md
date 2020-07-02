@@ -105,7 +105,7 @@ Default export, hook that accepts `PromiseConfig` and returns `PromiseState`. In
 
 | Parameter   | Type                         | Desrciption                              |
 | ----------- | ---------------------------- | ---------------------------------------- |
-| `data`      | `Data &#124; undefined`      | Result of resolved promise.              |
-| `error`     | `Error &#124; undefined`     | Error of rejected promise.               |
+| `data`      | `Data \| undefined`          | Result of resolved promise.              |
+| `error`     | `Error \| undefined`         | Error of rejected promise.               |
 | `isPending` | `boolean`                    | Promise pending status.                  |
 | `run`       | `(payload: Payload) => void` | Run `promiseThunk` with given `Payload`. |
