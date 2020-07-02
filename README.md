@@ -35,7 +35,7 @@ Note that you must memoize promise in advance or you'll get an infinite loop, be
 
 ### By callback
 
-Another handy way to call promise is using `promiseThunk` in config and `run` callback. This way it good for sending forms and other cases when you need to do something as a respond to user actions.
+Another handy way to call a promise is using `promiseThunk` in config and `run` callback. This way it useful for sending forms and other cases when you need to do something as a respond to user actions.
 
 ```js
 import React, { useState } from 'react';
@@ -54,7 +54,12 @@ const FeedbackForm = () => {
   });
 
   return (
-    <form onSubmit={() => run(feedback)}>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        run(feedback);
+      }}
+    >
       <textarea
         disabled={isPending}
         value={feedback}
@@ -100,7 +105,7 @@ Default export, hook that accepts `PromiseConfig` and returns `PromiseState`. In
 
 | Parameter   | Type                         | Desrciption                              |
 | ----------- | ---------------------------- | ---------------------------------------- |
-| `data`      | `Data | undefined`           | Result of resolved promise.              |
-| `error`     | `Error | undefined`          | Error of rejected promise.               |
+| `data`      | `Data &#124; undefined`      | Result of resolved promise.              |
+| `error`     | `Error &#124; undefined`     | Error of rejected promise.               |
 | `isPending` | `boolean`                    | Promise pending status.                  |
 | `run`       | `(payload: Payload) => void` | Run `promiseThunk` with given `Payload`. |
