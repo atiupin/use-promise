@@ -77,7 +77,7 @@ However, `data` will never be discarded.
 
 ### Demo
 
-Try it yourself on demo page.
+Check out live examples on demo page and take a look on their source code.
 
 ## API
 
