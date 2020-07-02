@@ -82,7 +82,7 @@ However, `data` will never be discarded.
 
 ### Demo
 
-Check out live examples on demo page and take a look on their source code.
+Check out live examples on [demo page](https://alextewpin.github.io/use-promise/) and take a look on their [source code](https://github.com/alextewpin/use-promise/blob/master/demo/App.tsx).
 
 ## API
 
