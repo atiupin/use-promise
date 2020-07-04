@@ -21,7 +21,7 @@ import usePromise from '@alextewpin/use-promise';
 import { fetchUser } from 'api';
 
 const Profile = ({ userId }) => {
-  const promise = useMemo(() => fetchUser(userId), [userId]);
+  const promise = useMemo(() => fetchUser(userId, [userId]));
 
   const { data, error, isPending } = usePromise({ promise });
 
