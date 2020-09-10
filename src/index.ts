@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useReducer, useRef, Reducer } from 'react';
 
 export interface PromiseConfig<T, U> {
-  promise?: Promise<T>;
-  promiseThunk?: (payload: U) => Promise<T>;
-  onResolve?: (data: T) => any;
-  onReject?: (error: Error) => any;
+  promiseThunk(payload: U): Promise<T>;
+  onResolve?(data: T, payload: U): void;
+  onReject?(error: Error, payload: U): void;
 }
 
-interface InternalState<T> {
+interface InternalState<T, U> {
   data?: T;
   error?: Error;
+  payload?: U;
   isPending: boolean;
 }
 
-export interface PromiseState<T, U> extends InternalState<T> {
+export interface PromiseState<T, U> extends InternalState<T, U> {
   run: (payload: U) => void;
 }
 
@@ -24,7 +24,8 @@ enum actionTypes {
   cancel = 'cancel',
 }
 
-interface RunAction {
+interface RunAction<U> {
+  payload: U;
   type: actionTypes.run;
 }
 
@@ -42,22 +43,28 @@ interface CancelAction {
   type: actionTypes.cancel;
 }
 
-type Action<T> = RunAction | ResolveAction<T> | RejectAction | CancelAction;
+type Action<T, U> =
+  | RunAction<U>
+  | ResolveAction<T>
+  | RejectAction
+  | CancelAction;
 
 const defaultState = {
   data: undefined,
   error: undefined,
+  payload: undefined,
   isPending: false,
 };
 
-const reducer = <T>(
-  state: InternalState<T>,
-  action: Action<T>,
-): InternalState<T> => {
+const reducer = <T, U>(
+  state: InternalState<T, U>,
+  action: Action<T, U>,
+): InternalState<T, U> => {
   switch (action.type) {
     case actionTypes.run:
       return Object.assign({}, state, {
         error: undefined,
+        payload: action.payload,
         isPending: true,
       });
     case actionTypes.resolve:
@@ -80,14 +87,13 @@ const reducer = <T>(
   }
 };
 
-const usePromise = <T, U = undefined>({
-  promise: userPromise,
+const usePromise = <T, U>({
   promiseThunk,
   onResolve,
   onReject,
 }: PromiseConfig<T, U>): PromiseState<T, U> => {
   const pendingPromiseRef = useRef<Promise<void> | null>(null);
-  const usedReducer = useReducer<Reducer<InternalState<T>, Action<T>>>(
+  const usedReducer = useReducer<Reducer<InternalState<T, U>, Action<T, U>>>(
     reducer,
     defaultState,
   );
@@ -95,27 +101,22 @@ const usePromise = <T, U = undefined>({
   const state = usedReducer[0];
   const dispatch = usedReducer[1];
 
-  if (userPromise && promiseThunk)
-    throw new Error(
-      'Both promise and promiseThunk are defined. This is not intended use of usePromise, each hook should correspond to one piece of data.',
-    );
-
   useEffect(
-    () => (): void => {
+    () => () => {
       pendingPromiseRef.current = null;
 
       dispatch({
         type: actionTypes.cancel,
       });
     },
-    [userPromise],
+    [dispatch],
   );
 
-  const runPromise = useCallback(
-    (promise: Promise<T>) => {
-      dispatch({ type: actionTypes.run });
+  const run = useCallback(
+    (payload: U) => {
+      dispatch({ type: actionTypes.run, payload });
 
-      const pendingPromise = promise
+      const pendingPromise = promiseThunk(payload)
         .then((data) => {
           if (pendingPromise === pendingPromiseRef.current) {
             dispatch({
@@ -124,7 +125,7 @@ const usePromise = <T, U = undefined>({
             });
 
             if (onResolve) {
-              onResolve(data);
+              onResolve(data, payload);
             }
           }
         })
@@ -136,30 +137,15 @@ const usePromise = <T, U = undefined>({
             });
 
             if (onReject) {
-              onReject(error);
+              onReject(error, payload);
             }
           }
         });
 
       pendingPromiseRef.current = pendingPromise;
     },
-    [onResolve, onReject],
+    [dispatch, promiseThunk, onReject, onResolve],
   );
-
-  const run = useCallback(
-    (payload: U) => {
-      if (promiseThunk) {
-        runPromise(promiseThunk(payload));
-      }
-    },
-    [promiseThunk, runPromise],
-  );
-
-  useEffect(() => {
-    if (userPromise) {
-      runPromise(userPromise);
-    }
-  }, [userPromise, runPromise]);
 
   return Object.assign({}, state, {
     run,

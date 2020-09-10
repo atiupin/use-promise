@@ -10,32 +10,9 @@ $ npm i @alextewpin/use-promise
 
 ## Usage
 
-### Data-driven
-
-Simplest way to use `use-promise` is to create a memoized data-dependent promise and pass it to the hook config:
-
-```js
-import React, { useMemo } from 'react';
-import usePromise from '@alextewpin/use-promise';
-
-import { fetchUser } from 'api';
-
-const Profile = ({ userId }) => {
-  const promise = useMemo(() => fetchUser(userId), [userId]);
-
-  const { data, error, isPending } = usePromise({ promise });
-
-  if (isPending) return <div>Loading...</div>;
-  if (error) return <div>Something is wrong</div>;
-  return <div>Hi, {user.name}!</div>;
-};
-```
-
-Note that you must memoize promise in advance or you'll get an infinite loop, because running a promise will cause component to rerender. `usePromise` doesn't use list of dependencies, promise is dependency itself.
-
 ### By callback
 
-Another handy way to call a promise is using `promiseThunk` in config and `run` callback. This way it useful for sending forms and other cases when you need to do something as a respond to user actions.
+Simplest way to use `use-promise` is pass a `promiseThunk` in config and then `run` callback. This way it useful for sending forms and other cases when you need to do something as a respond to user actions.
 
 ```js
 import React, { useState } from 'react';
@@ -74,6 +51,35 @@ const FeedbackForm = () => {
 
 In this case there is no need to memoize `promiseThunk` or `onResolve`. However, `run` is still dependent on these parameters, and will update accordingly.
 
+### Data-driven
+
+If you want to update promise state automatically based on you data, add a `useEffect` hook:
+
+```js
+import React, { useMemo } from 'react';
+import usePromise from '@alextewpin/use-promise';
+
+import { fetchUser } from 'api';
+
+const Profile = ({ userId }) => {
+  const promise = useMemo(() => fetchUser(userId), [userId]);
+
+  const { data, error, isPending, run } = usePromise({
+    promiseThunk: useCallback((id) => fetchUser(id)),
+  });
+
+  useEffect(() => {
+    run(userId);
+  }, [run, userId]);
+
+  if (isPending) return <div>Loading...</div>;
+  if (error) return <div>Something is wrong</div>;
+  return <div>Hi, {user.name}!</div>;
+};
+```
+
+Note that you must memoize every `usePromise` parameter in advance with `useCallback`, or you'll get an infinite loop, because running a promise will cause component to rerender.
+
 ### On cancelation
 
 Only one pending promise can exist in a hook state. If new promise is created for any reason (e.g. dependency update or `run` call), previous promise will be discared and `onResolve` or `onReject` will not be called on it. Also, this will happen if component is unmounted.
@@ -94,18 +100,18 @@ Default export, hook that accepts `PromiseConfig` and returns `PromiseState`. In
 
 ### interface PromiseConfig<Data, Payload>
 
-| Parameter       | Type                                  | Desrciption                                                                                                                   |
-| --------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `promise?`      | `Promise<Data>`                       | Promise, that will automatically runned on mount. Mutually exclusive with `promiseThunk`. Dependent on every other parameter. |
-| `promiseThunk?` | `(payload: Payload) => Promise<Data>` | Function that returns promise, can be called manually with `run`. Mutually exclusive with `promise`.                          |
-| `onResolve?`    | `(data: Data) => any`                 | Function that will be called on promise resolution.                                                                           |
-| `onReject?`     | `(error: Error) => any`               | Function that will be called on promise rejection.                                                                            |
+| Parameter      | Type                                       | Desrciption                                                      |
+| -------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| `promiseThunk` | `(payload: Payload) => Promise<Data>`      | Function that returns promise, can be called manually with `run` |
+| `onResolve?`   | `(data: Data, payload: Payload) => void`   | Function that will be called on promise resolution.              |
+| `onReject?`    | `(error: Error, payload: Payload) => void` | Function that will be called on promise rejection.               |
 
 ### interface PromiseState<Data, Payload>
 
 | Parameter   | Type                         | Desrciption                              |
 | ----------- | ---------------------------- | ---------------------------------------- |
-| `data?`     | `Data`                       | Result of resolved promise.              |
-| `error?`    | `Error`                      | Error of rejected promise.               |
+| `data?`     | `Data`                       | Result of the resolved promise.          |
+| `error?`    | `Error`                      | Error of the rejected promise.           |
+| `payload?`  | `Payload`                    | Last started promise payload.            |
 | `isPending` | `boolean`                    | Promise pending status.                  |
 | `run`       | `(payload: Payload) => void` | Run `promiseThunk` with given `Payload`. |

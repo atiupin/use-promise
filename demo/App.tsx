@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { FC, useState, useCallback, useEffect } from 'react';
 
 import usePromise from '../src';
 
@@ -13,23 +13,23 @@ const fetchSquare = (number: number, throwError: boolean): Promise<number> =>
 
 const formatError = (error?: Error) => (error ? error.message : String(error));
 
-const App = () => {
+const App: FC = () => {
   const [counter, setCounter] = useState(1);
+  const [autoUpdate, setAutoUpdate] = useState(false);
   const [throwError, setThrowError] = useState(false);
 
-  const fetchSquareMemo = useCallback(
-    (counter: number) => fetchSquare(counter, throwError),
-    [counter, throwError],
-  );
+  const { data, error, payload, isPending, run } = usePromise({
+    promiseThunk: useCallback(
+      (counter: number) => fetchSquare(counter, throwError),
+      [throwError],
+    ),
+  });
 
-  const promise = useMemo(() => fetchSquareMemo(counter), [
-    fetchSquareMemo,
-    counter,
-  ]);
-
-  const dataDrivenState = usePromise({ promise });
-
-  const callbackState = usePromise({ promiseThunk: fetchSquareMemo });
+  useEffect(() => {
+    if (autoUpdate) {
+      run(counter);
+    }
+  }, [autoUpdate, run, counter]);
 
   return (
     <>
@@ -55,7 +55,7 @@ const App = () => {
           }
           h2 {
             margin-top: 30px;
-            margin-bottom: 0px;
+            margin-bottom: 10px;
           }
           p {
             line-height: 1.5em;
@@ -72,15 +72,27 @@ const App = () => {
         </p>
         <p>
           In this example we have a counter and async function, that returns
-          square of any number after 1 second. "Throw errors" toggles if it will
-          resolve or rejects promise.
+          square of any number after 1 second. &quot;Throw errors&quot; toggles
+          if it will resolve or rejects promise.
         </p>
+        <h2>Component State</h2>
         <section>
           <p>Counter: {counter}</p>
           <p>
             <button onClick={() => setCounter((n) => n + 1)}>
               Plus Counter
             </button>
+          </p>
+          <p>
+            <label htmlFor="autoUpdate">
+              <input
+                type="checkbox"
+                id="autoUpdate"
+                checked={autoUpdate}
+                onChange={(e) => setAutoUpdate(e.target.checked)}
+              />
+              Update automatically
+            </label>
           </p>
           <p>
             <label htmlFor="throwError">
@@ -94,33 +106,19 @@ const App = () => {
             </label>
           </p>
         </section>
-        <h2>Data-driven</h2>
-        <p>
-          This data directly depends on promise and will update automatically.
-        </p>
+        <h2>Promise State</h2>
         <section>
           <p>
-            data: {String(dataDrivenState.data)}
+            data: {String(data)}
             <br />
-            error: {formatError(dataDrivenState.error)}
+            error: {formatError(error)}
             <br />
-            isPending: {String(dataDrivenState.isPending)}
-          </p>
-        </section>
-        <h2>Callback</h2>
-        <p>Here promise have to be run by pressing the button.</p>
-        <section>
-          <p>
-            data: {String(callbackState.data)}
+            payload: {String(payload)}
             <br />
-            error: {formatError(callbackState.error)}
-            <br />
-            isPending: {String(callbackState.isPending)}
+            isPending: {String(isPending)}
           </p>
           <p>
-            <button onClick={() => callbackState.run(counter)}>
-              Run Promise
-            </button>
+            <button onClick={() => run(counter)}>Run Promise</button>
           </p>
         </section>
       </article>
