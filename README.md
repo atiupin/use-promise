@@ -62,11 +62,9 @@ import usePromise from '@alextewpin/use-promise';
 import { fetchUser } from 'api';
 
 const Profile = ({ userId }) => {
-  const promise = useMemo(() => fetchUser(userId), [userId]);
+  const promiseThunk = useCallback((id) => fetchUser(id), []);
 
-  const { data, error, isPending, run } = usePromise({
-    promiseThunk: useCallback((id) => fetchUser(id)),
-  });
+  const { data, error, isPending, run } = usePromise({ promiseThunk });
 
   useEffect(() => {
     run(userId);
