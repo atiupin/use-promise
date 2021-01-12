@@ -1,20 +1,21 @@
 import { useCallback, useEffect, useReducer, useRef, Reducer } from 'react';
 
-export interface PromiseConfig<T, U> {
-  promiseThunk(payload: U): Promise<T>;
-  onResolve?(data: T, payload: U): void;
-  onReject?(error: Error, payload: U): void;
+export interface PromiseConfig<Data, Payload extends unknown[]> {
+  promiseThunk(...payload: Payload): Promise<Data>;
+  onResolve?(data: Data, ...payload: Payload): void;
+  onReject?(error: Error, ...payload: Payload): void;
 }
 
-interface InternalState<T, U> {
-  data?: T;
+interface InternalState<Data, Payload> {
+  data?: Data;
   error?: Error;
-  payload?: U;
+  payload?: Payload;
   isPending: boolean;
 }
 
-export interface PromiseState<T, U> extends InternalState<T, U> {
-  run: (payload: U) => void;
+export interface PromiseState<Data, Payload extends unknown[]>
+  extends InternalState<Data, Payload> {
+  run: (...payload: Payload) => void;
 }
 
 enum actionTypes {
@@ -24,13 +25,13 @@ enum actionTypes {
   cancel = 'cancel',
 }
 
-interface RunAction<U> {
-  payload: U;
+interface RunAction<Payload> {
+  payload: Payload;
   type: actionTypes.run;
 }
 
-interface ResolveAction<T> {
-  payload: T;
+interface ResolveAction<Data> {
+  payload: Data;
   type: actionTypes.resolve;
 }
 
@@ -43,9 +44,9 @@ interface CancelAction {
   type: actionTypes.cancel;
 }
 
-type Action<T, U> =
-  | RunAction<U>
-  | ResolveAction<T>
+type Action<Data, Payload> =
+  | RunAction<Payload>
+  | ResolveAction<Data>
   | RejectAction
   | CancelAction;
 
@@ -56,10 +57,10 @@ const defaultState = {
   isPending: false,
 };
 
-const reducer = <T, U>(
-  state: InternalState<T, U>,
-  action: Action<T, U>,
-): InternalState<T, U> => {
+const reducer = <Data, Payload>(
+  state: InternalState<Data, Payload>,
+  action: Action<Data, Payload>,
+): InternalState<Data, Payload> => {
   switch (action.type) {
     case actionTypes.run:
       return Object.assign({}, state, {
@@ -87,16 +88,15 @@ const reducer = <T, U>(
   }
 };
 
-const usePromise = <T, U>({
+const usePromise = <Data, Payload extends unknown[]>({
   promiseThunk,
   onResolve,
   onReject,
-}: PromiseConfig<T, U>): PromiseState<T, U> => {
+}: PromiseConfig<Data, Payload>): PromiseState<Data, Payload> => {
   const pendingPromiseRef = useRef<Promise<void> | null>(null);
-  const usedReducer = useReducer<Reducer<InternalState<T, U>, Action<T, U>>>(
-    reducer,
-    defaultState,
-  );
+  const usedReducer = useReducer<
+    Reducer<InternalState<Data, Payload>, Action<Data, Payload>>
+  >(reducer, defaultState);
 
   const state = usedReducer[0];
   const dispatch = usedReducer[1];
@@ -113,10 +113,10 @@ const usePromise = <T, U>({
   );
 
   const run = useCallback(
-    (payload: U) => {
+    (...payload: Payload) => {
       dispatch({ type: actionTypes.run, payload });
 
-      const pendingPromise = promiseThunk(payload)
+      const pendingPromise = promiseThunk(...payload)
         .then((data) => {
           if (pendingPromise === pendingPromiseRef.current) {
             dispatch({
@@ -125,7 +125,7 @@ const usePromise = <T, U>({
             });
 
             if (onResolve) {
-              onResolve(data, payload);
+              onResolve(data, ...payload);
             }
           }
         })
@@ -137,7 +137,7 @@ const usePromise = <T, U>({
             });
 
             if (onReject) {
-              onReject(error, payload);
+              onReject(error, ...payload);
             }
           }
         });

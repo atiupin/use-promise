@@ -92,24 +92,24 @@ Check out live examples on [demo page](https://alextewpin.github.io/use-promise/
 
 ### usePromise
 
-`<Data, Payload = undefined>(config: PromiseConfig<Data, Payload>) => PromiseState<Data, Payload>`
+`<Data, Payload extends unknown[]>(config: PromiseConfig<Data, Payload>) => PromiseState<Data, Payload>`
 
 Default export, hook that accepts `PromiseConfig` and returns `PromiseState`. In most cases there is not need to pass types manually.
 
-### interface PromiseConfig<Data, Payload>
+### interface PromiseConfig<Data, Payload extends unknown[]>
 
-| Parameter      | Type                                       | Desrciption                                                      |
-| -------------- | ------------------------------------------ | ---------------------------------------------------------------- |
-| `promiseThunk` | `(payload: Payload) => Promise<Data>`      | Function that returns promise, can be called manually with `run` |
-| `onResolve?`   | `(data: Data, payload: Payload) => void`   | Function that will be called on promise resolution.              |
-| `onReject?`    | `(error: Error, payload: Payload) => void` | Function that will be called on promise rejection.               |
+| Parameter      | Type                                          | Desrciption                                                      |
+| -------------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| `promiseThunk` | `(...payload: Payload) => Promise<Data>`      | Function that returns promise, can be called manually with `run` |
+| `onResolve?`   | `(data: Data, ...payload: Payload) => void`   | Function that will be called on promise resolution.              |
+| `onReject?`    | `(error: Error, ...payload: Payload) => void` | Function that will be called on promise rejection.               |
 
-### interface PromiseState<Data, Payload>
+### interface PromiseState<Data, Payload extends unknown[]>
 
-| Parameter   | Type                         | Desrciption                              |
-| ----------- | ---------------------------- | ---------------------------------------- |
-| `data?`     | `Data`                       | Result of the resolved promise.          |
-| `error?`    | `Error`                      | Error of the rejected promise.           |
-| `payload?`  | `Payload`                    | Last started promise payload.            |
-| `isPending` | `boolean`                    | Promise pending status.                  |
-| `run`       | `(payload: Payload) => void` | Run `promiseThunk` with given `Payload`. |
+| Parameter   | Type                            | Desrciption                                                                               |
+| ----------- | ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `data?`     | `Data`                          | Result of the resolved promise.                                                           |
+| `error?`    | `Error`                         | Error of the rejected promise.                                                            |
+| `payload?`  | `Payload`                       | Last started promise payload. Returned as array, as thunk may include multiple argumnets. |
+| `isPending` | `boolean`                       | Promise pending status.                                                                   |
+| `run`       | `(...payload: Payload) => void` | Run `promiseThunk` with given `Payload`.                                                  |

@@ -113,7 +113,7 @@ const App: FC = () => {
             <br />
             error: {formatError(error)}
             <br />
-            payload: {String(payload)}
+            payload: {payload ? JSON.stringify(payload) : String(payload)}
             <br />
             isPending: {String(isPending)}
           </p>
